@@ -59,7 +59,11 @@ RUN \
 	php7-xmlreader \
 	php7-zip \
 	py2-future \
-	py2-pip && \
+	py2-pip \
+	nodejs \
+	nodejs-npm && \
+ echo "**** install livereload ****" && \
+   npm install -g livereload && \
  echo "**** install certbot plugins ****" && \
  pip install -U --no-cache-dir \
 	pip && \
@@ -81,14 +85,21 @@ RUN \
 	/etc/fail2ban/jail.d/alpine-ssh.conf && \
  echo "**** copy fail2ban default action and filter to /default ****" && \
  mkdir -p /defaults/fail2ban && \
+ mkdir -p /run/nginx && \
+ mkdir -p /.stack/app && \
+ mkdir -p /var/log/livereload && \
  mv /etc/fail2ban/action.d /defaults/fail2ban/ && \
  mv /etc/fail2ban/filter.d /defaults/fail2ban/
 
 # add local files
 COPY root/ /
 
-ADD ./template /template
+ADD ./config /config/nginx/site-confs/default
 ADD ./oc.sh /var/lib/dupper/onconnect
 ADD ./od.sh /var/lib/dupper/ondisconnect
 
 VOLUME /config
+
+ENV PORT=3000
+EXPOSE 80
+EXPOSE 443
